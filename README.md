@@ -1,3 +1,5 @@
+⚠️ Work in Progress
+
 # 🔬 BitNet-Explorer: 1.58-bit Ternary Computing Lab
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
