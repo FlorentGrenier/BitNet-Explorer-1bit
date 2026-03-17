@@ -1,0 +1,60 @@
+def show_disclaimer():
+    disclaimer_text = (
+        "[bold yellow]Disclaimer:[/bold yellow] Ce modèle est destiné à la recherche.\n"
+        "Les réponses peuvent être inexactes ou biaisées. Vérifiez toujours les informations critiques."
+    )
+    console.print(Panel(disclaimer_text, title="⚠️ Safety Note", border_style="yellow"))
+
+    import sys
+import time
+from rich.console import Console
+from rich.panel import Panel
+from rich.live import Live
+from rich.markdown import Markdown
+from bitnet import BitLinear, BitNetLlamaForCausalLM
+from transformers import AutoTokenizer
+
+console = Console()
+
+def load_model():
+    model_name = "microsoft/bitnet-b1.58-3B" # Ou la version 2B-4T
+    console.print(f"[bold blue]Chargement de BitNet ({model_name})...[/bold blue]")
+    
+    # Chargement du tokenizer
+    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    
+    # Chargement du modèle avec l'architecture BitNet spécifique
+    # C'est ici que les poids sont gérés en {-1, 0, 1}
+    model = BitNetLlamaForCausalLM.from_pretrained(model_id)
+    
+    return model, tokenizer
+
+def chat():
+    model, tokenizer = load_model()
+    
+    console.print(Panel.fit("🚀 [bold green]BitNet Local CLI[/bold green]\nTapez 'exit' pour quitter", border_style="green"))
+
+    while True:
+        user_input = console.input("\n[bold cyan]Vous > [/bold cyan]")
+        if user_input.lower() in ["exit", "quit"]:
+            break
+
+        # Préparation du prompt
+        inputs = tokenizer(user_input, return_tensors="pt").to(model.device)
+        
+        console.print("[bold magenta]BitNet > [/bold magenta]", end="")
+        
+        # Simulation d'affichage en streaming pour l'effet "IA"
+        # Note : BitNet supporte le streaming natif via transformers
+        full_response = ""
+        with Live(console=console, refresh_per_second=10) as live:
+            # Ici on génère les tokens (simplifié pour l'exemple)
+            outputs = model.generate(**inputs, max_new_tokens=100, do_sample=True)
+            text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+            
+            # On nettoie pour ne garder que la réponse
+            response = text[len(user_input):].strip()
+            live.update(Markdown(response))
+
+if __name__ == "__main__":
+    chat()

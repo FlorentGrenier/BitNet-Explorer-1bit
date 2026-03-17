@@ -1,0 +1,6 @@
+bitnet
+torch
+--transformers
+rich
+psutil
+accelerate
